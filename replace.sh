@@ -1,5 +1,5 @@
 #!/bin/bash
-namespae=kubesphere-logging-system
+namespace=kubesphere-logging-system
 
 input_list=$(kubectl get inputs.logging.kubesphere.io -n "${namespace}" -o json)
 
