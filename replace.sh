@@ -112,6 +112,45 @@ echo "${cluster_output_list[i]}"
 done
 
 
+fluentbit_config__list=$(kubectl get  fluentbitconfigs.logging.kubesphere.io -n "${namespace}" -o json)
+fluentbit_config_name=($(echo $fluentbit_config__list | jq -r '.items[].metadata.name | @json'))
+fluentbit_config_spec=($(echo $fluentbit_config_list | jq -r '.items[].spec | @json'))
+fluentbit_config_labels=($(echo $fluentbit_config_list | jq -r '.items[].metadata.labels | @json'))
+
+fluentbit_config_size=${#fluentbit_config_spec[*]}
+echo "$fluentbit_config_size"
+
+for((i=0;i<${output_size};i++));do
+cluster_fluentbit_config_list[i]="{
+\"apiVersion\": \"fluentbit.fluent.io/v1alpha2\",
+\"kind\": \"ClusterFluentBitConfig\",
+\"metadata\": {
+\"name\": ${fluentbit_config_name[i]},
+\"labels\": ${fluentbit_config_labels[i]}
+},
+\"spec\": ${fluentbit_config_spec[i]}
+}"
+done
+
+
+fluentbit_list=$(kubectl get fluentbits.logging.kubesphere.io -n "${namespace}" -o json)
+fluentbit_name=($(echo $fluentbit_list | jq -r '.items[].metadata.name | @json'))
+fluentbit_spec=($(echo $fluentbit_list | jq -r '.items[].spec | @json'))
+fluentbit_labels=($(echo $fluentbit_list | jq -r '.items[].metadata.labels | @json'))
+fluentbit_size=${#fluentbit_name[*]}
+echo "fb$fluentbit_size"
+
+for((i=0;i<${fluentbit_size};i++));do
+cluster__fluentbit_list[i]="{
+\"apiVersion\": \"fluentbit.fluent.io/v1alpha2\",
+\"kind\": \"FluentBit\",
+\"metadata\": {
+\"name\": ${fluentbit_name[i]},
+\"labels\": ${fluentbit_labels[i]}
+},
+\"spec\": ${fluentbit_spec[i]}
+}"
+done
 
 
 
