@@ -95,7 +95,7 @@ cluster_fluentbit_config_list[i]="{
 \"apiVersion\": \"fluentbit.fluent.io/v1alpha2\",
 \"kind\": \"ClusterFluentBitConfig\",
 \"metadata\": {
-\"name\": ${fluentbit_config_name[i]},
+\"name\": \"fluent-operator-${fluentbit_name[i]}\",
 \"labels\": ${fluentbit_config_labels[i]}
 },
 \"spec\": ${fluentbit_config_spec[i]}
@@ -104,7 +104,7 @@ done
 
 
 fluentbit_list=$(kubectl get fluentbits.logging.kubesphere.io -n "${namespace}" -o json)
-fluentbit_name=($(echo $fluentbit_list | jq -r '.items[].metadata.name | @json'))
+fluentbit_name=($(echo $fluentbit_list | jq -r '.items[].metadata.name'))
 fluentbit_spec=($(echo $fluentbit_list | jq -r '.items[].spec | @json'))
 fluentbit_labels=($(echo $fluentbit_list | jq -r '.items[].metadata.labels | @json'))
 fluentbit_size=${#fluentbit_name[*]}
@@ -117,7 +117,7 @@ cluster__fluentbit_list[i]="{
 \"metadata\": {
 \"name\": ${fluentbit_name[i]},
 \"labels\": ${fluentbit_labels[i]},
-\"namespace\": ${namespace}
+\"namespace\": \"${namespace}\"
 },
 \"spec\": ${fluentbit_spec[i]}
 }"
