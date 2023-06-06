@@ -24,9 +24,9 @@ done
 
 
 parser_list=$(kubectl get parsers.logging.kubesphere.io -n "${namespace}" -o json)
-parser_name=($(echo $input_list | jq -r '.items[].metadata.name | @json'))
-parser_labels=($(echo $input_list | jq -r '.items[].metadata.labels | @json'))
-parser_spec=($(echo $input_list | jq -r '.items[].spec | @json'))
+parser_name=($(echo $parser_list | jq -r '.items[].metadata.name | @json'))
+parser_labels=($(echo $parser_list | jq -r '.items[].metadata.labels | @json'))
+parser_spec=($(echo $parser_list | jq -r '.items[].spec | @json'))
 parser_size=${#parser_spec[*]}
 echo "$parser_size"
 
@@ -53,7 +53,7 @@ echo "filtersize$filter_size"
 for((i=0;i<${filter_size};i++));do
 cluster_filter_list[i]="{
 \"apiVersion\": \"fluentbit.fluent.io/v1alpha2\",
-\"kind\": \"ClusterClusterFilter\",
+\"kind\": \"ClusterFilter\",
 \"metadata\": {
 \"name\": ${filter_name[i]},
 \"labels\": ${filter_labels[i]}
@@ -83,8 +83,8 @@ cluster_output_list[i]="{
 done
 
 
-fluentbit_config__list=$(kubectl get  fluentbitconfigs.logging.kubesphere.io -n "${namespace}" -o json)
-fluentbit_config_name=($(echo $fluentbit_config__list | jq -r '.items[].metadata.name | @json'))
+fluentbit_config_list=$(kubectl get  fluentbitconfigs.logging.kubesphere.io -n "${namespace}" -o json)
+fluentbit_config_name=($(echo $fluentbit_config_list | jq -r '.items[].metadata.name | @json'))
 fluentbit_config_spec=($(echo $fluentbit_config_list | jq -r '.items[].spec | @json'))
 fluentbit_config_labels=($(echo $fluentbit_config_list | jq -r '.items[].metadata.labels | @json'))
 fluentbit_config_size=${#fluentbit_config_spec[*]}
@@ -117,6 +117,7 @@ cluster__fluentbit_list[i]="{
 \"metadata\": {
 \"name\": ${fluentbit_name[i]},
 \"labels\": ${fluentbit_labels[i]}
+\"namespace\": ${namespace}
 },
 \"spec\": ${fluentbit_spec[i]}
 }"
