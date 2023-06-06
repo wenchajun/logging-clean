@@ -116,7 +116,7 @@ cluster__fluentbit_list[i]="{
 \"kind\": \"FluentBit\",
 \"metadata\": {
 \"name\": ${fluentbit_name[i]},
-\"labels\": ${fluentbit_labels[i]}
+\"labels\": ${fluentbit_labels[i]},
 \"namespace\": ${namespace}
 },
 \"spec\": ${fluentbit_spec[i]}
