@@ -95,7 +95,7 @@ cluster_fluentbit_config_list[i]="{
 \"apiVersion\": \"fluentbit.fluent.io/v1alpha2\",
 \"kind\": \"ClusterFluentBitConfig\",
 \"metadata\": {
-\"name\": \"fluent-operator-${fluentbit_name[i]}\",
+\"name\": ${fluentbit_config_name[i]},
 \"labels\": ${fluentbit_config_labels[i]}
 },
 \"spec\": ${fluentbit_config_spec[i]}
@@ -114,7 +114,7 @@ cluster__fluentbit_list[i]="{
 \"apiVersion\": \"fluentbit.fluent.io/v1alpha2\",
 \"kind\": \"FluentBit\",
 \"metadata\": {
-\"name\": ${fluentbit_name[i]},
+\"name\":  \"fluent-operator-${fluentbit_name[i]}\",
 \"labels\": ${fluentbit_labels[i]},
 \"namespace\": \"${namespace}\"
 },
