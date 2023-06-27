@@ -1,11 +1,16 @@
 #!/bin/bash
 namespace=kubesphere-logging-system
 
+function error_exit {
+  echo "$1" 1>&2
+  exit 1
+}
+
 function converting(){
 ## Converting an existing configuration to a new one
 local resource=$1
 local kind=$2
-local list=$(kubectl get  $resource.logging.kubesphere.io -A -o json)
+local list=$(kubectl get  $resource.logging.kubesphere.io -A -o json) || error_exit "Cannot get resource $reresource"
 local name=($(echo $list | jq -r '.items[].metadata.name | @json'))
 local labels=($(echo $list | jq -r '.items[].metadata.labels | @json'))
 local spec=($(echo $list | jq -r '.items[].spec | @json'))
@@ -24,14 +29,14 @@ cluster_resource_list[i]="{
 done
 
 for((i=0;i<${size};i++));do
-echo ${cluster_resource_list[i]} | kubectl apply -f -
+echo ${cluster_resource_list[i]} | kubectl apply -f - || error_exit "Cannot apply resource $reresource"
 done
 ## Uninstall the fluentbit-operator and the original configuration
 for((i=0;i<${size};i++));do
 echo "${name[i]}"
   temp=$(echo ${name[i]} | sed 's/"//g')
   echo "$temp"
-   kubectl delete  $resource.logging.kubesphere.io $temp -n ${namespace}
+   kubectl delete  $resource.logging.kubesphere.io $temp -n ${namespace} || error_exit "Cannot delete resource $reresource"
 done
 }
 
@@ -41,7 +46,7 @@ converting "filters" "ClusterFilter"
 converting "outputs" "ClusterOutput"
 converting "fluentbitconfigs" "ClusterFluentBitConfig"
 
-fluentbit_list=$(kubectl get fluentbits.logging.kubesphere.io -A -o json)
+fluentbit_list=$(kubectl get fluentbits.logging.kubesphere.io -A -o json) || error_exit "Cannot get resource fluentbit"
 fluentbit_name=($(echo $fluentbit_list | jq -r '.items[].metadata.name'))
 fluentbit_spec=($(echo $fluentbit_list | jq -r '.items[].spec | @json'))
 fluentbit_labels=($(echo $fluentbit_list | jq -r '.items[].metadata.labels | @json'))
@@ -62,7 +67,14 @@ cluster__fluentbit_list[i]="{
 done
 
 for((i=0;i<${fluentbit_size};i++));do
-echo ${cluster__fluentbit_list[i]} | kubectl apply -f -
+echo ${cluster__fluentbit_list[i]} | kubectl apply -f - || error_exit "Cannot apply resource fluentbit"
+done
+
+for((i=0;i<${fluentbit_size};i++));do
+echo "${fluentbit_name[i]}"
+  fluentbit_temp=$(echo ${fluentbit_name[i]} | sed 's/"//g')
+  echo "$fluentbit_temp"
+   kubectl delete fluentbit.logging.kubesphere.io $fluentbit_temp -n ${namespace}  || error_exit "Cannot delete resource fluentbit"
 done
 
 # Determine if Deployment exists
