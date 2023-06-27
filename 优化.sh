@@ -22,7 +22,6 @@ cluster_resource__list[i]="{
 \"spec\": ${spec[i]}
 }"
 done
-}
 
 for((i=0;i<${size};i++));do
 echo ${cluster_resource_list[i]} | kubectl apply -f -
