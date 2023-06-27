@@ -2,17 +2,15 @@
 namespace=kubesphere-logging-system
 
 function converting(){
-
 ## Converting an existing configuration to a new one
 local resource=$1
 local kind=$2
-local list=$(kubectl get inputs.logging.kubesphere.io -A -o json)
+local list=$(kubectl get  $resource.logging.kubesphere.io -A -o json)
 local name=($(echo $list | jq -r '.items[].metadata.name | @json'))
 local labels=($(echo $list | jq -r '.items[].metadata.labels | @json'))
 local spec=($(echo $list | jq -r '.items[].spec | @json'))
 local size=${#spec[*]}
-echo "Number of original input configuration files:$input_size"
-
+echo "Number of original $resource configuration files:$size"
 for((i=0;i<${size};i++));do
 cluster_resource__list[i]="{
 \"apiVersion\": \"fluentbit.fluent.io/v1alpha2\",
@@ -29,16 +27,14 @@ done
 for((i=0;i<${size};i++));do
 echo ${cluster_resource_list[i]} | kubectl apply -f -
 done
-
 ## Uninstall the fluentbit-operator and the original configuration
-for((i=0;i<${input_size};i++));do
-echo "${input_name[i]}"
-  input_temp=$(echo ${input_name[i]} | sed 's/"//g')
-  echo "$input_temp"
-   kubectl delete input.logging.kubesphere.io $input_temp -n ${namespace}
+for((i=0;i<${size};i++));do
+echo "${name[i]}"
+  temp=$(echo ${name[i]} | sed 's/"//g')
+  echo "$temp"
+   kubectl delete  $resource.logging.kubesphere.io $temp -n ${namespace}
 done
 }
-
 
 converting(input ClusterInput)
 converting(parsers ClusterParser)
