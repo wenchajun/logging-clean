@@ -12,7 +12,7 @@ local spec=($(echo $list | jq -r '.items[].spec | @json'))
 local size=${#spec[*]}
 echo "Number of original $resource configuration files:$size"
 for((i=0;i<${size};i++));do
-cluster_resource__list[i]="{
+cluster_resource_list[i]="{
 \"apiVersion\": \"fluentbit.fluent.io/v1alpha2\",
 \"kind\": \"${kind}\",
 \"metadata\": {
@@ -35,11 +35,11 @@ echo "${name[i]}"
 done
 }
 
-converting(input ClusterInput)
-converting(parsers ClusterParser)
-converting(filters ClusterFilter)
-converting(outputs ClusterOutput)
-converting(fluentbitconfigs ClusterFluentBitConfig)
+converting "inputs" "ClusterInput"
+converting "parsers" "ClusterParser"
+converting "filters" "ClusterFilter"
+converting "outputs" "ClusterOutput"
+converting "fluentbitconfigs" "ClusterFluentBitConfig"
 
 fluentbit_list=$(kubectl get fluentbits.logging.kubesphere.io -A -o json)
 fluentbit_name=($(echo $fluentbit_list | jq -r '.items[].metadata.name'))
